@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Mauli Hardware{% endblock %}</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+ .topbar{background:#131921}.topbar .brand{color:#ffb703;font-weight:700;font-size:1.4rem;text-decoration:none}
+ .subnav{background:#232f3e}.subnav a{color:#fff;text-decoration:none;padding:6px 12px;display:inline-block;font-size:.9rem}
+ .subnav a:hover{background:#37475a}.card-img-top{height:180px;object-fit:contain;background:#f8f9fa;padding:8px}
+ .price{font-size:1.15rem;font-weight:600}.mrp{text-decoration:line-through;color:#6c757d;font-size:.9rem}
+ .off{color:#cc0c39;font-weight:600}.star{color:#f4a300}
+</style>
+</head>
+<body>
+<div class="topbar py-2"><div class="container d-flex gap-3 align-items-center">
+  <a href="{% url 'catalog' %}" class="brand">Mauli Hardware</a>
+  <form class="flex-grow-1 d-flex" action="{% url 'catalog' %}" method="get">
+    <input class="form-control rounded-0 rounded-start" name="q" placeholder="Search tools, pipes, paint, screws..." value="{{ request.GET.q }}">
+    <button class="btn btn-warning rounded-0 rounded-end">Search</button>
+  </form>
+  <a class="text-white text-decoration-none" href="{% url 'track' %}">Track order</a>
+  <a class="text-white text-decoration-none" href="{% url 'cart' %}">🛒 Cart <span class="badge bg-warning text-dark">{{ cart_count }}</span></a>
+</div></div>
+<div class="subnav"><div class="container">
+  <a href="{% url 'catalog' %}">All</a>
+  {% for c in nav_categories %}<a href="{% url 'catalog' %}?category={{ c.slug }}">{{ c.name }}</a>{% endfor %}
+</div></div>
+<div class="container my-3">
+  {% for m in messages %}<div class="alert alert-{% if m.tags == 'error' %}danger{% else %}{{ m.tags }}{% endif %}">{{ m }}</div>{% endfor %}
+  {% block content %}{% endblock %}
+</div>
+<footer class="text-center text-muted py-4 small">© Mauli Hardware · Prices include GST</footer>
+</body></html>

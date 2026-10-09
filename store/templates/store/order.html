@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h4>Order #{{ order.pk }}</h4>
+<p>Status: <span class="badge bg-primary">{{ order.get_status_display }}</span>
+ {% if order.payment_method == 'COD' %}<span class="badge bg-secondary">Cash on Delivery</span>{% endif %}
+ {% if order.tracking_note %}<br>Tracking: {{ order.tracking_note }}{% endif %}</p>
+{% if order.status == 'PAID' or order.payment_method == 'COD' %}<div class="alert alert-success">Thank you! Your order is confirmed.</div>{% endif %}
+<table class="table"><tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th></tr>
+{% for i in order.items.all %}<tr><td>{{ i.product_name }}</td><td>{{ i.quantity }}</td><td>₹{{ i.unit_price }}</td><td>₹{{ i.line_total }}</td></tr>{% endfor %}
+<tr><td colspan="3" class="text-end">Delivery</td><td>₹{{ order.delivery_charge }}</td></tr>
+<tr><th colspan="3" class="text-end">Total</th><th>₹{{ order.total }}</th></tr></table>
+<p><b>Deliver to:</b> {{ order.name }}, {{ order.address }}, {{ order.city }} - {{ order.pincode }} · {{ order.phone }}</p>
+{% if order.gstin %}<p>GSTIN: {{ order.gstin }}</p>{% endif %}
+{% endblock %}

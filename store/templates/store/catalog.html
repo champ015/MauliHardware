@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<form class="row g-2 mb-3" method="get">
+  <input type="hidden" name="q" value="{{ q }}">
+  <div class="col-md-3"><select name="category" class="form-select" onchange="this.form.submit()">
+    <option value="">All categories</option>
+    {% for c in nav_categories %}<option value="{{ c.slug }}" {% if c.slug == current_cat %}selected{% endif %}>{{ c.name }}</option>{% endfor %}
+  </select></div>
+  <div class="col-md-2"><input name="min" class="form-control" placeholder="Min ₹" value="{{ pmin }}"></div>
+  <div class="col-md-2"><input name="max" class="form-control" placeholder="Max ₹" value="{{ pmax }}"></div>
+  <div class="col-md-3"><select name="sort" class="form-select">
+    <option value="">Newest</option>
+    <option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+    <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+    <option value="rating" {% if sort == 'rating' %}selected{% endif %}>Top rated</option>
+  </select></div>
+  <div class="col-md-2"><button class="btn btn-dark w-100">Apply</button></div>
+</form>
+{% if q %}<p class="text-muted">Results for "<b>{{ q }}</b>"</p>{% endif %}
+<div class="row row-cols-2 row-cols-md-4 g-3">
+{% for p in page %}{% with v=p.default_variant %}
+  <div class="col"><div class="card h-100">
+    <a href="{% url 'product' p.slug %}">{% if p.image %}<img src="{{ p.image.url }}" class="card-img-top" alt="{{ p.name }}">{% else %}<div class="card-img-top d-flex align-items-center justify-content-center text-muted">No image</div>{% endif %}</a>
+    <div class="card-body">
+      <a href="{% url 'product' p.slug %}" class="text-dark text-decoration-none"><div class="small text-muted">{{ p.brand }}</div>{{ p.name }}</a>
+      {% if p.rating %}<div class="star small">★ {{ p.rating }}</div>{% endif %}
+      {% if v %}<div><span class="price">₹{{ v.price }}</span> <span class="mrp">{% if v.discount_percent %}₹{{ v.mrp }}{% endif %}</span>
+        {% if v.discount_percent %}<span class="off small">{{ v.discount_percent }}% off</span>{% endif %}</div>
+        {% if not v.in_stock %}<div class="text-danger small">Out of stock</div>{% endif %}{% endif %}
+    </div></div></div>
+{% endwith %}{% empty %}<p>No products found.</p>{% endfor %}
+</div>
+{% if page.paginator.num_pages > 1 %}
+<nav class="mt-4"><ul class="pagination justify-content-center">
+  {% if page.has_previous %}<li class="page-item"><a class="page-link" href="?{{ qs }}&page={{ page.previous_page_number }}">Prev</a></li>{% endif %}
+  <li class="page-item disabled"><span class="page-link">{{ page.number }} / {{ page.paginator.num_pages }}</span></li>
+  {% if page.has_next %}<li class="page-item"><a class="page-link" href="?{{ qs }}&page={{ page.next_page_number }}">Next</a></li>{% endif %}
+</ul></nav>{% endif %}
+{% endblock %}

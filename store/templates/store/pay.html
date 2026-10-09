@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="text-center my-5">
+  <h4>Order #{{ order.pk }} — Pay ₹{{ order.total }}</h4>
+  <p>Subtotal ₹{{ order.subtotal }} + Delivery ₹{{ order.delivery_charge }}</p>
+  <button id="payBtn" class="btn btn-warning btn-lg">Pay Now (UPI / Card / Netbanking)</button>
+</div>
+<form id="verifyForm" method="post" action="{% url 'payment_verify' %}">{% csrf_token %}
+  <input type="hidden" name="razorpay_payment_id" id="pid">
+  <input type="hidden" name="razorpay_order_id" id="oid">
+  <input type="hidden" name="razorpay_signature" id="sig">
+</form>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+const rzp = new Razorpay({
+  key: "{{ key_id }}", amount: "{{ amount }}", currency: "INR", name: "Mauli Hardware",
+  order_id: "{{ order.razorpay_order_id }}",
+  prefill: {name: "{{ order.name|escapejs }}", contact: "{{ order.phone }}", email: "{{ order.email|escapejs }}"},
+  handler: function(r){
+    document.getElementById('pid').value=r.razorpay_payment_id;
+    document.getElementById('oid').value=r.razorpay_order_id;
+    document.getElementById('sig').value=r.razorpay_signature;
+    document.getElementById('verifyForm').submit();
+  }
+});
+document.getElementById('payBtn').onclick=()=>rzp.open();
+rzp.open();
+</script>
+{% endblock %}

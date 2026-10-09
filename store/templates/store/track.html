@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h4>Track your order</h4>
+<form method="post" class="col-md-4">{% csrf_token %}
+  <input name="order_id" class="form-control mb-2" placeholder="Order number" required>
+  <input name="phone" class="form-control mb-2" placeholder="Mobile number used in order" required>
+  <button class="btn btn-dark">Track</button>
+</form>
+{% endblock %}
